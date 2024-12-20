@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HeySay Project</title>
+  <style>
+    body {
+      background-color: white;
+      color: #333;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      background-color: #4CAF50;
+      padding: 12px 0;
+      text-align: center;
+    }
+
+    .navbar a {
+      color: white;
+      padding: 14px 20px;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 18px;
+    }
+
+    .navbar a:hover {
+      background-color: #45a049;
+    }
+
+    .content {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      font-size: 40px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .time-stats {
+      font-size: 18px;
+      color: #555;
+      line-height: 1.8;
+    }
+
+    .stats-item {
+      font-weight: bold;
+    }
+
+    .time-stats p {
+      font-size: 18px;
+      color: #444;
+      margin: 8px 0;
+      line-height: 1.6;
+    }
+
+    .time-stats span {
+      font-weight: bold;
+      color: #4CAF50;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="navbar">
+    <a href="#">Home</a>
+    <a href="#">About Us</a>
+    <a href="#">Contact</a>
+  </div>
+
+  <div class="content">
+    <h1>Hello Nerds</h1>
+
+    <div class="time-stats">
+      <h2>Current Time (Local, IST, NY, London, Sydney):</h2>
+      <p id="time">
+        <span>Loading...</span>
+      </p>
+
+      <h2>System Stats:</h2>
+      <p id="stats">
+        <span>Loading...</span>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // Fetch current time data from the server
+    fetch('/date')
+      .then(response => response.json())
+      .then(data => {
+        const timeElement = document.getElementById('time');
+        timeElement.innerHTML = `
+          <span>Local Time:</span> ${data.localTime} <br>
+          <span>IST Time:</span> ${data.istTime} <br>
+          <span>New York Time:</span> ${data.newYorkTime} <br>
+          <span>London Time:</span> ${data.londonTime} <br>
+          <span>Sydney Time:</span> ${data.sydneyTime} <br>
+        `;
+      })
+      .catch(error => {
+        console.error('Error fetching time data:', error);
+        document.getElementById('time').innerHTML = 'Failed to load time data.';
+      });
+
+    // Fetch system stats from the server
+    fetch('/stats')
+      .then(response => response.json())
+      .then(data => {
+        const statsElement = document.getElementById('stats');
+        statsElement.innerHTML = `
+          <span>Memory Usage:</span> <br> 
+          RSS: ${data.memoryUsage.rss} bytes, Heap Total: ${data.memoryUsage.heapTotal} bytes, 
+          Heap Used: ${data.memoryUsage.heapUsed} bytes, External: ${data.memoryUsage.external} bytes <br>
+          <span>CPU Usage:</span> <br>
+          ${data.cpuUsage.map((cpu, index) => `
+            CPU ${index + 1} - Model: ${cpu.model}, Speed: ${cpu.speed} MHz, 
+            User Time: ${cpu.times.user}, System Time: ${cpu.times.sys}, Idle Time: ${cpu.times.idle} <br>
+          `).join('')}
+        `;
+      })
+      .catch(error => {
+        console.error('Error fetching stats data:', error);
+        document.getElementById('stats').innerHTML = 'Failed to load stats data.';
+      });
+  </script>
+
+</body>
+</html>
